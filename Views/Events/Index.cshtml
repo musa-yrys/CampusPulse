@@ -1,0 +1,15 @@
+@model IReadOnlyList<CampusPulse.Models.CampusEvent>
+@{ ViewData["Title"] = "Кампус іс-шаралары"; var categories = ViewBag.Categories as List<string> ?? new(); }
+<section class="hero">
+  <div class="hero-copy"><div class="eyebrow"><span class="pulse-dot"></span> СТУДЕНТТІК ӨМІРДІҢ ОРТАЛЫҒЫ</div><h1>Кампус өмірі<br /><em>осы жерден</em> басталады.</h1><p>Клубтар, кездесулер, идеялар. Өзіңе қызық оқиғаны тап та, қатарға қосыл.</p>
+    <form class="searchbar" method="get"><span>⌕</span><input name="search" value="@ViewBag.Search" placeholder="Іс-шара не клуб іздеу" /><button type="submit">Іздеу</button></form>
+    <div class="hero-meta"><span>✳ @Model.Count оқиға табылды</span><span>◷ Осы аптада жаңалары бар</span></div>
+  </div>
+  <div class="hero-art"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="art-core"><span>MEET</span><strong>YOUR<br />PEOPLE</strong><small>Кампус · 2026</small></div><span class="art-star star-one">✳</span><span class="art-star star-two">✦</span><div class="art-note">бірге<br />қызығырақ <span>↗</span></div></div>
+</section>
+<section class="events-section">
+  <div class="section-heading"><div><div class="eyebrow muted">КҮНТІЗБЕГЕ ҚОСЫЛ</div><h2>Жақында болатындар</h2></div><a class="text-link" asp-controller="Manage" asp-action="Index">Барлық іс-шара <span>→</span></a></div>
+  <div class="filter-row"><a class="chip @(string.IsNullOrEmpty(ViewBag.Category as string) ? "selected" : "")" asp-action="Index">Барлығы</a>@foreach (var category in categories) { <a class="chip @((ViewBag.Category as string) == category ? "selected" : "")" asp-action="Index" asp-route-category="@category">@category</a> }</div>
+  @if (Model.Count == 0) { <div class="empty-state"><span>✳</span><h3>Әзірше ештеңе табылмады</h3><p>Басқа сөзбен іздеп көр немесе жаңа іс-шара ұсын.</p></div> }
+  else { <div class="event-grid">@foreach (var item in Model) { var enrolled = item.Registrations.Count(r => !r.IsWaitlisted); var percent = item.Capacity == 0 ? 0 : Math.Min(100, enrolled * 100 / item.Capacity); <article class="event-card"><div class="card-cover cover-@((item.Id % 4) + 1)"><span class="category-tag">@item.Category</span><span class="cover-symbol">@(item.Category == "Кино" ? "◉" : item.Category == "Ойын" ? "✣" : item.Category == "Шығармашылық" ? "✳" : "♧")</span><span class="club-pill">@item.Club</span></div><div class="card-body"><div class="event-date">@item.StartsAt.ToString("dd MMM", new System.Globalization.CultureInfo("kk-KZ")) <span>·</span> @item.StartsAt.ToString("HH:mm")</div><h3>@item.Title</h3><p class="venue">⌖ @item.Venue</p><div class="capacity"><div class="capacity-label"><span>@enrolled / @item.Capacity орын</span><span>@(item.Capacity - enrolled) бос</span></div><div class="meter"><i style="width:@percent%"></i></div></div><a class="card-link" asp-action="Details" asp-route-id="@item.Id">Толығырақ <span>↗</span></a></div></article> } </div> }
+</section>
