@@ -1,35 +1,35 @@
-using CampusPulse.Data;
-using CampusPulse.Models;
 using Microsoft.EntityFrameworkCore;
+using StudentRegistrationSystem.Data;
+using StudentRegistrationSystem.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
-builder.Services.AddDbContext<CampusDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("CampusDb")));
+builder.Services.AddDbContext<StudentDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("StudentDb")));
 
 var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<CampusDbContext>();
-    db.Database.Migrate();
-    if (!db.Events.Any())
+    var db = scope.ServiceProvider.GetRequiredService<StudentDbContext>();
+    await db.Database.EnsureCreatedAsync();
+    if (!await db.Groups.AnyAsync())
     {
-        db.Events.AddRange(
-            new CampusEvent { Title = "Түнгі кино: Интерстеллар", Club = "Cinema Circle", Category = "Кино", Summary = "Ғарыш пен уақыт туралы фильмді бірге көріп, соңында пікірталас өткіземіз.", Venue = "A корпус · 204 аудитория", Organizer = "Аружан М.", StartsAt = DateTime.Now.AddDays(2).Date.AddHours(18), Capacity = 42, IsFeatured = true },
-            new CampusEvent { Title = "Кампус фото серуені", Club = "Frame Lab", Category = "Шығармашылық", Summary = "Қаладағы қызықты бұрыштарды тауып, мобильді фотосурет түсіру тәсілдерін үйренеміз.", Venue = "Бас кітапхана алды", Organizer = "Данияр С.", StartsAt = DateTime.Now.AddDays(3).Date.AddHours(15), Capacity = 18 },
-            new CampusEvent { Title = "Жасыл аула: сенбілік", Club = "Eco Step", Category = "Қоғамдық жұмыс", Summary = "Аулаға көшет отырғызып, кампусты таза ұстау бойынша шағын жоспар жасаймыз.", Venue = "Оңтүстік аула", Organizer = "Мадина К.", StartsAt = DateTime.Now.AddDays(5).Date.AddHours(10), Capacity = 30 },
-            new CampusEvent { Title = "Board game evening", Club = "Tabletop Guild", Category = "Ойын", Summary = "Үстел ойындарын ойнап, жаңадан келгендермен танысу кеші.", Venue = "Студенттер үйі · Lounge", Organizer = "Ержан Т.", StartsAt = DateTime.Now.AddDays(6).Date.AddHours(17), Capacity = 24 }
-        );
-        db.SaveChanges();
+        db.Groups.AddRange(new StudentGroup { Name = "ИС-21" }, new StudentGroup { Name = "ИС-22" }, new StudentGroup { Name = "ПИ-21" });
+        await db.SaveChangesAsync();
+    }
+    if (!await db.Students.AnyAsync())
+    {
+        var groups = await db.Groups.OrderBy(group => group.Id).ToListAsync();
+        db.Students.AddRange(
+            new Student { FirstName = "Айдана", LastName = "Серік", Email = "aidana@example.com", Phone = "+7 700 111 22 33", GroupId = groups[0].Id },
+            new Student { FirstName = "Нұрлан", LastName = "Әлиев", Email = "nurlan@example.com", Phone = "+7 701 222 33 44", GroupId = groups[1].Id },
+            new Student { FirstName = "Аружан", LastName = "Қасымова", Email = "aruzhan@example.com", GroupId = groups[2].Id });
+        await db.SaveChangesAsync();
     }
 }
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
-}
+if (!app.Environment.IsDevelopment()) { app.UseExceptionHandler("/Home/Error"); app.UseHsts(); }
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
-app.MapControllerRoute(name: "default", pattern: "{controller=Events}/{action=Index}/{id?}");
+app.MapControllerRoute(name: "default", pattern: "{controller=Students}/{action=Index}/{id?}");
 app.Run();

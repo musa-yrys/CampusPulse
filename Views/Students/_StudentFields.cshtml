@@ -1,0 +1,8 @@
+@model Student
+<div class="form-grid">
+    <div class="form-field"><label asp-for="FirstName"></label><input asp-for="FirstName" autocomplete="given-name" /><span asp-validation-for="FirstName"></span></div>
+    <div class="form-field"><label asp-for="LastName"></label><input asp-for="LastName" autocomplete="family-name" /><span asp-validation-for="LastName"></span></div>
+    <div class="form-field"><label asp-for="Email"></label><input asp-for="Email" autocomplete="email" /><span asp-validation-for="Email"></span></div>
+    <div class="form-field"><label asp-for="Phone"></label><input asp-for="Phone" autocomplete="tel" /><span asp-validation-for="Phone"></span></div>
+    <div class="form-field full-field"><label asp-for="GroupId"></label><select asp-for="GroupId" asp-items="ViewBag.GroupId"><option value="">Топты таңдаңыз</option></select><span asp-validation-for="GroupId"></span></div>
+</div>

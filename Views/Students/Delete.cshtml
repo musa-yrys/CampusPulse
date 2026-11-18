@@ -1,0 +1,13 @@
+@model Student
+@{ ViewData["Title"] = "Студентті өшіру"; }
+<section class="page-shell form-page">
+    <a class="back-link" asp-action="Index">← Тізімге оралу</a>
+    <div class="form-heading"><span class="eyebrow">ЖАЗБАНЫ ӨШІРУ</span><h1>Өшіруді растайсыз ба?</h1><p>Бұл әрекетті кері қайтару мүмкін емес.</p></div>
+    <div class="confirm-card"><h2>@Model.LastName @Model.FirstName</h2><dl><dt>Email</dt><dd>@Model.Email</dd><dt>Тобы</dt><dd>@Model.Group?.Name</dd></dl>
+        <form asp-action="Delete" method="post" class="form-actions">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
+            <button class="danger-button" type="submit">Иә, өшіру</button><a class="secondary-button" asp-action="Index">Болдырмау</a>
+        </form>
+    </div>
+</section>

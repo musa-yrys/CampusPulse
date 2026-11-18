@@ -1,0 +1,31 @@
+@model IEnumerable<Student>
+@{ ViewData["Title"] = "Студенттер"; var searchString = ViewData["SearchString"] as string; }
+<section class="page-shell">
+    <div class="hero-row">
+        <div><span class="eyebrow">СТУДЕНТТЕРДІ БАСҚАРУ</span><h1>Тіркеу жүйесі</h1><p class="intro">Студенттер тізімін қараңыз, іздеңіз және жаңартыңыз.</p></div>
+        <a class="primary-button" asp-action="Create">+ Жаңа студент</a>
+    </div>
+    <form asp-action="Index" method="get" class="searchbar">
+        <label class="sr-only" for="searchString">Аты бойынша іздеу</label>
+        <input id="searchString" name="searchString" value="@searchString" placeholder="Аты немесе тегі бойынша іздеу" />
+        <button type="submit">Іздеу</button>
+        @if (!string.IsNullOrWhiteSpace(searchString)) { <a class="clear-link" asp-action="Index">Тазарту</a> }
+    </form>
+    <div class="list-heading"><h2>Студенттер тізімі</h2><span>@Model.Count() студент</span></div>
+    @if (!Model.Any())
+    {
+        <div class="empty-state"><strong>Студент табылмады</strong><p>Іздеу сөзін өзгертіңіз немесе жаңа студент тіркеңіз.</p><a class="text-link" asp-action="Create">Студент қосу →</a></div>
+    }
+    else
+    {
+        <div class="table-wrap"><table>
+            <thead><tr><th>СТУДЕНТ</th><th>EMAIL</th><th>ТЕЛЕФОН</th><th>ТОП</th><th>ӘРЕКЕТТЕР</th></tr></thead>
+            <tbody>
+            @foreach (var student in Model)
+            {
+                <tr><td><strong>@student.LastName @student.FirstName</strong><small>№ @student.Id</small></td><td>@student.Email</td><td>@(student.Phone ?? "—")</td><td><span class="group-badge">@student.Group?.Name</span></td><td class="row-actions"><a asp-action="Edit" asp-route-id="@student.Id">Өңдеу</a><a class="delete-link" asp-action="Delete" asp-route-id="@student.Id">Өшіру</a></td></tr>
+            }
+            </tbody>
+        </table></div>
+    }
+</section>
